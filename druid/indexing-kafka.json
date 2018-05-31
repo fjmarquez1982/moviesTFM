@@ -1,0 +1,76 @@
+{
+  "type": "kafka",
+  "dataSchema": {
+    "dataSource": "movies-tfm",
+    "parser": {
+      "type": "string",
+      "parseSpec": {
+        "format": "json",
+        "timestampSpec": {
+          "column": "timeValoration",
+          "format": "ruby"
+        },
+        "dimensionsSpec": {
+          "dimensions": ["idMovie","titleMovie","idUser"],
+          "dimensionExclusions": [
+            "timeValoration",
+            "valoration"
+          ]
+        }
+      }
+    },
+    "metricsSpec": [
+      {
+        "name": "views",
+        "type": "count"
+      },
+      {
+        "name": "value_min",
+        "fieldName": "valoration",
+        "type": "doubleMin"
+      },
+      {
+        "name": "value_max",
+        "fieldName": "valoration",
+        "type": "doubleMax"
+      },
+      {
+        "name": "sum_valorations",
+        "fieldName": "valoration",
+        "type": "doubleSum"
+      },
+      { 
+         "type" : "hyperUnique",
+        "name" : "uniqueUsers",
+        "fieldName" : "idUser",
+        "isInputHyperUnique" : false,
+        "round" : true
+      },
+      { 
+         "type" : "hyperUnique",
+        "name" : "uniqueMovies",
+        "fieldName" : "idMovie",
+        "isInputHyperUnique" : false,
+        "round" : true
+      }
+    ],
+    "granularitySpec": {
+      "type": "uniform",
+      "segmentGranularity": "HOUR",
+      "queryGranularity": "minute"
+    }
+  },
+  "tuningConfig": {
+    "type": "kafka",
+    "maxRowsPerSegment": 5000000
+  },
+  "ioConfig": {
+    "topic": "valorations-druid-topic",
+    "consumerProperties": {
+      "bootstrap.servers": "localhost:9092"
+    },
+    "taskCount": 1,
+    "replicas": 1,
+    "taskDuration": "PT2M"
+  }
+}
